@@ -19,12 +19,15 @@
 
 <body>
 
-
-
     <div class="drawer font-mono">
         <input id="my-drawer" type="checkbox" class="drawer-toggle" />
         <div class="drawer-content">
+
             <!-- Page content here -->
+
+            <div class="flex flex-row items-center justify-center h-14 bg-primary">
+                <p class="font-extrabold f">Livraison offerte dès 29€ d'achats</p>
+            </div>
 
             <div class="navbar py-5 bg-neutral">
                 <div class="navbar-start ml-5">
@@ -44,12 +47,12 @@
                     <div title="Change Theme" class="dropdown dropdown-end ">
                         <div tabindex="0" class="btn gap-1 normal-case btn-ghost" spellcheck="false"><svg
                                 width="20" height="20" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                viewBox="0 0 24 24" class="inline-block h-5 w-5 stroke-current md:h-6 md:w-6">
+                                viewBox="0 0 24 24" class="inline-block h-5 w-5 stroke-neutral-content md:h-6 md:w-6">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01">
                                 </path>
-                            </svg> <span class="md:inline">Theme</span> <svg width="12px" height="12px"
-                                class="ml-1 h-3 w-3 fill-current opacity-60 sm:inline-block"
+                            </svg> <span class="md:inline text-neutral-content">Theme</span> <svg width="12px" height="12px"
+                                class="fill-neutral-content ml-1 h-3 w-3 opacity-60 sm:inline-block"
                                 xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2048 2048">
                                 <path d="M1799 349l242 241-1017 1017L7 590l242-241 775 775 775-775z"></path>
                             </svg>
@@ -57,11 +60,6 @@
                         <div
                             class="dropdown-content bg-base-200 text-base-content rounded-t-box rounded-b-box top-px max-h-96 h-[70vh] w-52 overflow-y-auto shadow-2xl mt-16">
                             <div class="grid grid-cols-1 gap-3 p-3" tabindex="0" spellcheck="false">
-                                <label class="label">
-                                    <span class="label-text">Theme</span>
-                                </label>
-
-
 
                                 @foreach ($themeList as $value)
                                     <div class="outline-base-content overflow-hidden rounded-lg outline-2 outline-offset-2 post-name
@@ -122,12 +120,15 @@
                             class="btn btn-ghost btn-circle avatar  @if ($session->has('userId')) online;
                                                                                     @else
                                                                                     offline @endif">
-                            <div class="w-10 rounded-full">
-                                <img
-                                    src="@if ($session->has('userId')) {{ $session->get('userAvatar') }}
+                            <div class="w-10 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
+                                @if ($session->has('userId')) <img class="stroke-neutral-content" src="{{ $session->get('userAvatar') }}"/>
                                     @else
-                                    https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png?20200919003010 @endif 
-                                " />
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" class="stroke-neutral-content w-auto h-auto">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                                      </svg>
+                                      
+                                    @endif 
+                                
                             </div>
                         </div>
                         <ul tabindex="0"

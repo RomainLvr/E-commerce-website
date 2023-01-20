@@ -28,3 +28,4 @@ Route::get('/produits', [ProductsController::class, 'showProducts'])-> name('pro
 
 Route::get('/produit{id}', [ProductController::class, 'showProduct'])-> name('produit');
 
+Route::get('/sortProducts', [ProductsController::class, 'sort'])-> name('sortProducts');
