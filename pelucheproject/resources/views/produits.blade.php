@@ -11,7 +11,7 @@
                 </select>
                 <div class="w-1/2 px-4 flex justify-end">
                     <div class="flex flex-row justify-center relative">
-                        <input type="text" placeholder="Rechercher"
+                        <input id="search" type="text" placeholder="Rechercher"
                             class="input input-bordered input-primary w-full max-w-xs" />
                         <button type="submit" class="absolute right-0 top-0 mt-3 mr-4">
                             <svg class="h-5 w-5 text-gray-500" fill="none" stroke-linecap="round"
@@ -59,6 +59,21 @@
                     url: "{{ route('sortProducts') }}",
                     data: {
                         sort: sort
+                    },
+                }).done(function(data) {
+                    $('section[name="productsGrid"]').html($(data).find(
+                        'section[name="productsGrid"]').html());
+                });
+            });
+        });
+        $(document).ready(function() {
+            $('#search').keyup(function() {
+                var search = $(this).val();
+
+                $.ajax({
+                    url: "{{ route('searchProducts') }}",
+                    data: {
+                        search: search
                     },
                 }).done(function(data) {
                     $('section[name="productsGrid"]').html($(data).find(

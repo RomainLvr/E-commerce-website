@@ -41,4 +41,11 @@ class ProductsController extends Controller
                 break;
         }
     }
+
+    public function search(Request $request)
+    {
+        $search = $request->search;
+        $products = ProductModel::where('name', 'like', '%' . $search . '%')->get();
+        return view('produits', ['produits' => $products]);
+    }
 }
