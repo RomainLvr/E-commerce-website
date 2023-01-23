@@ -1,15 +1,16 @@
 <x-layout>
     <div class="py-8">
         <div class="container mx-auto">
-            <div class="flex flex-wrap -mx-4">
+            <div class="flex flex-row justify-between">
                 <select id="sort" class="select select-primary w-full max-w-xs">
                     <option disabled selected>Trier par</option>
                     <option value="priceAsc">Prix croissant</option>
                     <option value="priceDesc">Prix décroissant</option>
                     <option value="nameAsc">Nom A-Z</option>
                     <option value="nameDesc">Nom Z-A</option>
+                    <option value="new">Nouveautés</option>
                 </select>
-                <div class="w-1/2 px-4 flex justify-end">
+                <div class="">
                     <div class="flex flex-row justify-center relative">
                         <input id="search" type="text" placeholder="Rechercher"
                             class="input input-bordered input-primary w-full max-w-xs" />
@@ -28,7 +29,8 @@
             @foreach ($produits as $produit)
                 <div name="product"
                     class="card card-compact max-w-screen-sm bg-base-100 shadow-xl hover:scale-105 transition-transform">
-                    <figure><img src="{{ asset('storage/images/' . $produit->image) }}" alt="{{ $produit->image }}"
+                    <figure class="max-w-xl min-w-fit"><img class="max-w-md"
+                            src="{{ asset('storage/images/' . $produit->image) }}" alt="{{ $produit->image }}"
                             alt="{{ $produit->image }}" /></figure>
                     <div class="card-body">
                         <h2 class="card-title">{{ $produit->name }}
@@ -51,33 +53,42 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
+        //if $sort or $search is set, we send an ajax request to filterProducts
+        //and we replace the productsGrid section with the new one
         $(document).ready(function() {
             $('#sort').change(function() {
-                var sort = $(this).val();
-
+                let sort = $(this).val();
+                let search = $('#search').val();
                 $.ajax({
-                    url: "{{ route('sortProducts') }}",
+                    url: "{{ route('filterProducts') }}",
                     data: {
-                        sort: sort
-                    },
-                }).done(function(data) {
-                    $('section[name="productsGrid"]').html($(data).find(
-                        'section[name="productsGrid"]').html());
-                });
-            });
-        });
-        $(document).ready(function() {
-            $('#search').keyup(function() {
-                var search = $(this).val();
-
-                $.ajax({
-                    url: "{{ route('searchProducts') }}",
-                    data: {
+                        sort: sort,
                         search: search
                     },
                 }).done(function(data) {
-                    $('section[name="productsGrid"]').html($(data).find(
-                        'section[name="productsGrid"]').html());
+                    $('section[name="productsGrid"]').fadeOut(250, function() {
+                        $('section[name="productsGrid"]').html($(data).find(
+                            'section[name="productsGrid"]').html());
+                        $('section[name="productsGrid"]').fadeIn(250);
+                    });
+                });
+            });
+
+            $('#search').keyup(function() {
+                let sort = $('#sort').val();
+                let search = $(this).val();
+                $.ajax({
+                    url: "{{ route('filterProducts') }}",
+                    data: {
+                        sort: sort,
+                        search: search
+                    },
+                }).done(function(data) {
+                    $('section[name="productsGrid"]').fadeOut(250, function() {
+                        $('section[name="productsGrid"]').html($(data).find(
+                            'section[name="productsGrid"]').html());
+                        $('section[name="productsGrid"]').fadeIn(250);
+                    });
                 });
             });
         });
