@@ -1,8 +1,22 @@
 @php
-    $themeList = ["light", "dark", "cupcake", "bumblebee", "emerald", "corporate", "synthwave", "retro", "cyberpunk", "valentine", "halloween", "garden", "forest", "aqua", "lofi", "pastel", "fantasy", "wireframe", "black", "luxury", "dracula", "cmyk", "autumn", "business", "acid", "lemonade", "night", "coffee", "winter"];
+    $themeList = ['light', 'dark', 'cupcake', 'bumblebee', 'emerald', 'corporate', 'synthwave', 'retro', 'cyberpunk', 'valentine', 'halloween', 'garden', 'forest', 'aqua', 'lofi', 'pastel', 'fantasy', 'wireframe', 'black', 'luxury', 'dracula', 'cmyk', 'autumn', 'business', 'acid', 'lemonade', 'night', 'coffee', 'winter'];
     $session = session();
-    $views = File::allFiles(resource_path('views'));
-    $excludedViews = ['layout', 'produit']; 
+    //$views = (File::allFiles(resource_path('views')))->except(['produit', File::allFiles(resource_path('views/produit'))]);
+    $except =
+    array_merge(
+        ['produit','dashboard'],
+        array_map(function($file) {return str_replace('.blade.php', '', $file->getFileName());}, (File::allFiles(resource_path('views/auth')))),
+        array_map(function($file) {return str_replace('.blade.php', '', $file->getFileName());}, (File::allFiles(resource_path('views/components')))),
+        array_map(function($file) {return str_replace('.blade.php', '', $file->getFileName());}, (File::allFiles(resource_path('views/layouts')))),
+        array_map(function($file) {return str_replace('.blade.php', '', $file->getFileName());}, (File::allFiles(resource_path('views/profile'))))
+    );
+
+    $viewsArray = array_map(function($file) {
+        return str_replace('.blade.php', '', $file->getFileName());
+    }, (File::allFiles(resource_path('views'))));
+    
+    $views = array_diff($viewsArray, $except);
+
 @endphp
 
 <!doctype html>
@@ -51,8 +65,8 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01">
                                 </path>
-                            </svg> <span class="md:inline text-neutral-content">Theme</span> <svg width="12px" height="12px"
-                                class="fill-neutral-content ml-1 h-3 w-3 opacity-60 sm:inline-block"
+                            </svg> <span class="md:inline text-neutral-content">Theme</span> <svg width="12px"
+                                height="12px" class="fill-neutral-content ml-1 h-3 w-3 opacity-60 sm:inline-block"
                                 xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2048 2048">
                                 <path d="M1799 349l242 241-1017 1017L7 590l242-241 775 775 775-775z"></path>
                             </svg>
@@ -121,14 +135,16 @@
                                                                                     @else
                                                                                     offline @endif">
                             <div class="w-10 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
-                                @if ($session->has('userId')) <img class="stroke-neutral-content" src="{{ $session->get('userAvatar') }}"/>
-                                    @else
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" class="stroke-neutral-content w-auto h-auto">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
-                                      </svg>
-                                      
-                                    @endif 
-                                
+                                @if ($session->has('userId'))
+                                    <img class="stroke-neutral-content" src="{{ $session->get('userAvatar') }}" />
+                                @else
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                        stroke-width="1.5" class="stroke-neutral-content w-auto h-auto">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                                    </svg>
+                                @endif
+
                             </div>
                         </div>
                         <ul tabindex="0"
@@ -153,9 +169,9 @@
                             </li>
                             <li>
                                 @if (isset($_SESSION['userId']))
-                                    <a href="">Déconnexion</a>
+                                    <a href="{{ route('logout') }}">Déconnexion</a>
                                 @else
-                                    <a href="">Connexion</a>
+                                    <a href="{{ route('login') }}">Connexion</a>
                                 @endif
                             </li>
                         </ul>
@@ -209,14 +225,13 @@
         <div class="drawer-side">
             <label for="my-drawer" class="drawer-overlay"></label>
             <ul class="menu p-4 w-80 bg-base-100 text-base-content">
+                <p class="text-center font-bold text-4xl mt-6 mb-6 tracking-widest">MENU</p>
 
                 @foreach ($views as $view)
-                @if ( in_array(str_replace('.blade.php', '', $view->getFilename()), $excludedViews))
-                @continue
-                @endif
                     <li>
-                        <a href="{{ str_replace('.blade.php', '', $view->getFilename()) }}" class="justify-center font-extrabold text-xl">
-                            {{ strtoupper(str_replace('.blade.php', '', $view->getFilename())) }}
+                        <a href="{{ str_replace('.blade.php', '', $view) }}"
+                            class="justify-center font-extrabold text-xl">
+                            {{ strtoupper(str_replace('.blade.php', '', $view)) }}
                         </a>
                     </li>
                 @endforeach

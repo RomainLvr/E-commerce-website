@@ -39,15 +39,18 @@
                 <p class="text-xl mt-8 mb-12">{{ $produit->description }}</p>
                 <div class="flex items-center gap-6 mb-6 mt-4">
                     @if ($produit->discount)
-                        <span class="text-red-600 text-3xl font-extrabold">
+                        <span class="text-red-600 text-3xl font-extrabold price"
+                            id="{{ $produit->price - ($produit->price * $produit->discount) / 100 }}">
                             {{ $produit->getDiscundPrice() }}
                         </span>
-                        <span class="text-gray-500 text-xl line-through">{{ $produit->getFormattedPrice() }}</span>
+                        <span class="text-gray-500 text-xl line-through price"
+                            id="{{ $produit->price }}">{{ $produit->getFormattedPrice() }}</span>
                         <div class="badge badge-lg badge-secondary">
                             <span class="text-xl font-extrabold mt-1">-{{ $produit->discount }}%</span>
                         </div>
                     @else
-                        <span class="text-3xl font-extrabold mt-2">{{ $produit->getFormattedPrice() }}</span>
+                        <span class="text-3xl font-extrabold mt-2 price"
+                            id="{{ $produit->price }}">{{ $produit->getFormattedPrice() }}</span>
                     @endif
                     @if ($produit->stock == 0)
                         <span class="flex flex-row items-center text-xl font-extrabold text-error">
@@ -74,8 +77,8 @@
                             <label class="label">
                                 <span class="label-text">Quantité</span>
                             </label>
-                            <input type="range" min="1" max="{{ $produit->stock }}" value="1"
-                                class="range" step="1" />
+                            <input id="qte" type="range" min="1" max="{{ $produit->stock }}"
+                                value="1" class="range" step="1" />
                             <div class="w-full flex justify-between text-xs px-2 mb-6">
                                 @for ($i = 1; $i <= $produit->stock; $i++)
                                     <span>{{ $i }}</span>
@@ -195,9 +198,9 @@
                     preview.classList.remove('border-2', 'border-primary', 'opacity-60');
                 });
                 preview.classList.add('border-2', 'border-primary', 'opacity-60');
-                fullPreview.src = preview.src;
                 fullPreview.classList.add('opacity-0');
                 setTimeout(() => {
+                    fullPreview.src = preview.src;
                     fullPreview.classList.remove('opacity-0');
                 }, 200);
             });
@@ -207,6 +210,22 @@
             document.querySelector('#modalImage').src = fullPreview.src;
             document.querySelector('#my-modal-4').checked = true;
         });
+
+        @if ($produit->stock > 1)
+
+            document.getElementById('qte').addEventListener('change', function() {
+                var prices = document.querySelectorAll('.price');
+
+                prices.forEach((price) => {
+                    price.classList.add('transition-opacity');
+                    price.classList.add('opacity-0');
+                    setTimeout(() => {
+                        price.innerHTML = (price.id * this.value).toFixed(2) + ' €';
+                        price.classList.remove('opacity-0');
+                    }, 200);
+                });
+            });
+        @endif
     </script>
 
 
