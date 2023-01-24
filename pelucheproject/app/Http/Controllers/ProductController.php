@@ -11,4 +11,5 @@ class ProductController extends Controller
         $product = ProductModel::find($id);
         return view('produit', ['produit' => $product]);
     }
+
 }
