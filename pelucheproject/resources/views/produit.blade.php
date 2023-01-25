@@ -6,12 +6,12 @@
             <div class="mr-6">
                 @foreach ($produit->getAllImages() as $image)
                     <img id="preview" class="w-24 h-24 rounded-2xl mb-4"
-                        src="{{ asset('storage/images/' . $image->image) }}" alt="{{ $image->image }}" />
+                        src="{{ asset('storage/images/products/' . $image->image) }}" alt="{{ $image->image }}" />
                 @endforeach
             </div>
             <div class="w-full md:w-1/2">
                 <img id="fullPreview" class="rounded-2xl w-max"
-                    src="{{ asset('storage/images/' . $produit->getPrimaryImage()->image) }}"
+                    src="{{ asset('storage/images/products/' . $produit->getPrimaryImage()->image) }}"
                     alt="{{ $produit->image }}" />
             </div>
             <div class="w-full md:w-1/2">
@@ -19,17 +19,18 @@
                     {{ $produit->name }}
                 </h1>
                 <div class="flex flex-row gap-2 items-baseline mt-2">
+                      
                     <div class="rating rating-half">
-                        <input type="radio" name="rating-10" class="rating-hidden" disabled
+                        <input type="radio" name="rating-10" class="rating-hidden border-0 rounded-none" disabled
                             @if ($produit->getRate() == 0) checked @endif />
                         @for ($i = 1; $i <= 10; $i++)
                             @if ($i % 2 != 0)
                                 <input type="radio" name="rating-10"
-                                    class="bg-orange-400 mask mask-star-2 mask-half-1" disabled
+                                    class="bg-orange-400 mask mask-star-2 mask-half-1 border-0 rounded-none [bg-none]" disabled
                                     @if ($i / 2 <= $produit->getRate()) checked @endif />
                             @else
                                 <input type="radio" name="rating-10"
-                                    class="bg-orange-400 mask mask-star-2 mask-half-2" disabled
+                                    class="bg-orange-400 mask mask-star-2 mask-half-2 border-0 rounded-none" disabled
                                     @if ($i / 2 <= $produit->getRate()) checked @endif />
                             @endif
                         @endfor

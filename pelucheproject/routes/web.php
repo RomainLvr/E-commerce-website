@@ -40,6 +40,10 @@ Route::get('/logout', function () {
     return view('logout');
 });
 
+Route::get('/register', function () {
+    return view('register');
+});
+
 
 Route::get('/dashboard', function () {
     return view('dashboard');

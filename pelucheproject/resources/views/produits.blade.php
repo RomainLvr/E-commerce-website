@@ -33,7 +33,7 @@
                     <div class="relative">
                         <figure class="max-w-xl min-w-fit rounded-t-2xl"><img
                                 class="max-w-md @if ($produit->stock == 0) opacity-50 @endif"
-                                src="{{ asset('storage/images/' . $produit->getPrimaryImage()->image) }}" />
+                                src="{{ asset('storage/images/products/' . $produit->getPrimaryImage()->image) }}" />
                         </figure>
                         @if ($produit->stock == 0)
                             <div class="w-max h-max absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">

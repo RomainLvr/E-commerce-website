@@ -2,29 +2,37 @@
     $themeList = ['light', 'dark', 'cupcake', 'bumblebee', 'emerald', 'corporate', 'synthwave', 'retro', 'cyberpunk', 'valentine', 'halloween', 'garden', 'forest', 'aqua', 'lofi', 'pastel', 'fantasy', 'wireframe', 'black', 'luxury', 'dracula', 'cmyk', 'autumn', 'business', 'acid', 'lemonade', 'night', 'coffee', 'winter'];
     $session = session();
     //$views = (File::allFiles(resource_path('views')))->except(['produit', File::allFiles(resource_path('views/produit'))]);
-    $except =
-    array_merge(
-        ['produit','dashboard'],
-        array_map(function($file) {return str_replace('.blade.php', '', $file->getFileName());}, (File::allFiles(resource_path('views/auth')))),
-        array_map(function($file) {return str_replace('.blade.php', '', $file->getFileName());}, (File::allFiles(resource_path('views/components')))),
-        array_map(function($file) {return str_replace('.blade.php', '', $file->getFileName());}, (File::allFiles(resource_path('views/layouts')))),
-        array_map(function($file) {return str_replace('.blade.php', '', $file->getFileName());}, (File::allFiles(resource_path('views/profile'))))
+    $except = array_merge(
+        ['produit', 'dashboard'],
+        array_map(function ($file) {
+            return str_replace('.blade.php', '', $file->getFileName());
+        }, File::allFiles(resource_path('views/auth'))),
+        array_map(function ($file) {
+            return str_replace('.blade.php', '', $file->getFileName());
+        }, File::allFiles(resource_path('views/components'))),
+        array_map(function ($file) {
+            return str_replace('.blade.php', '', $file->getFileName());
+        }, File::allFiles(resource_path('views/layouts'))),
+        array_map(function ($file) {
+            return str_replace('.blade.php', '', $file->getFileName());
+        }, File::allFiles(resource_path('views/profile'))),
     );
-
-    $viewsArray = array_map(function($file) {
+    
+    $viewsArray = array_map(function ($file) {
         return str_replace('.blade.php', '', $file->getFileName());
-    }, (File::allFiles(resource_path('views'))));
+    }, File::allFiles(resource_path('views')));
     
     $views = array_diff($viewsArray, $except);
-
+    
 @endphp
 
 <!doctype html>
-<html data-theme="light">
+<html data-theme="light" lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -54,7 +62,7 @@
 
                 </div>
                 <div class="navbar-center">
-                    <a class="btn btn-ghost normal-case text-xl" href="accueil.phtml"><img class="h-12"
+                    <a class="btn btn-ghost normal-case text-xl" href="{{ route('accueil') }}"><img class="h-12"
                             src=""></a>
                 </div>
                 <div class="navbar-end mr-5">
@@ -129,14 +137,16 @@
                     @endif
 
                     </form>
-                    <div class="dropdown dropdown-end">
+                    <div class="dropdown dropdown-end ml-4">
                         <div tabindex="0"
-                            class="btn btn-ghost btn-circle avatar  @if ($session->has('userId')) online;
-                                                                                    @else
-                                                                                    offline @endif">
+                            class="btn btn-ghost btn-circle avatar 
+                             @if (Auth::check()) {{ __('online') }}
+                             @else
+                             {{ __('offline') }} @endif">
                             <div class="w-10 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
-                                @if ($session->has('userId'))
-                                    <img class="stroke-neutral-content" src="{{ $session->get('userAvatar') }}" />
+                                @if (Auth::check() && Auth::user()->avatar != null)
+                                    <img src="{{ asset('storage/images/avatars/' . Auth::user()->avatar) }}"
+                                        alt="avatar">
                                 @else
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                         stroke-width="1.5" class="stroke-neutral-content w-auto h-auto">
@@ -149,31 +159,25 @@
                         </div>
                         <ul tabindex="0"
                             class="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52">
-                            <li>
-                                @if ($session->has('userId'))
-                                    <p class='justify-between'>
-                                        Profil
-                                    @else
-                                    <p class='justify-between'>
-                                        Profil
-                                @endif
 
-                                <span class="badge">
-                                    @if (isset($_SESSION['userId']))
-                                        {{ $_SESSION['initiatorName'] }}
-                                    @else
-                                        Visiteur
-                                    @endif
-                                </span>
-                                </a>
-                            </li>
-                            <li>
-                                @if (isset($_SESSION['userId']))
-                                    <a href="{{ route('logout') }}">Déconnexion</a>
-                                @else
-                                    <a href="{{ route('login') }}">Connexion</a>
-                                @endif
-                            </li>
+                            @if (Auth::check())
+                                <li><a href="{{ route('profile.edit') }}">Profil <span
+                                            class="badge">{{ Auth::user()->name }}</span></a></li>
+                                <li>
+                                    <form method="POST" action="{{ route('logout') }}">
+                                        @csrf
+
+                                        <a :href="route('logout')"
+                                            onclick="event.preventDefault();
+                                                            this.closest('form').submit();">
+                                            {{ __('Se déconnecter') }}
+                                        </a>
+                                    </form>
+                                </li>
+                            @else
+                                <li><a href="{{ route('login') }}">Se connecter</a> </li>
+                                <li><a href="{{ route('register') }}">S'inscrire</a> </li>
+                            @endif
                         </ul>
                     </div>
                 </div>

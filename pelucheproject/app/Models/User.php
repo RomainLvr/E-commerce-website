@@ -26,7 +26,6 @@ class User extends Authenticatable
         'address',
         'phone',
         'role',
-        'verified',
         'created_at',
         'updated_at',
         'deleted_at',
