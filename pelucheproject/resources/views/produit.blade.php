@@ -26,11 +26,11 @@
                         @for ($i = 1; $i <= 10; $i++)
                             @if ($i % 2 != 0)
                                 <input type="radio" name="rating-10"
-                                    class="bg-orange-400 mask mask-star-2 mask-half-1 border-0 rounded-none [bg-none]" disabled
+                                    class="bg-orange-400 mask mask-star-2 mask-half-1 border-0 rounded-none checked:bg-none checked:bg-orange-400" disabled
                                     @if ($i / 2 <= $produit->getRate()) checked @endif />
                             @else
                                 <input type="radio" name="rating-10"
-                                    class="bg-orange-400 mask mask-star-2 mask-half-2 border-0 rounded-none" disabled
+                                    class="bg-orange-400 mask mask-star-2 mask-half-2 border-0 rounded-none checked:bg-none checked:bg-orange-400" disabled
                                     @if ($i / 2 <= $produit->getRate()) checked @endif />
                             @endif
                         @endfor
