@@ -12,6 +12,5 @@ class ThemeController extends Controller
     {
         $theme = $request->themeSet;
         $request->session()->put('themeSet', $theme);
-        return redirect()->back();
     }
 }

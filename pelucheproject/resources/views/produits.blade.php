@@ -2,23 +2,34 @@
     <div class="py-8">
         <div class="container mx-auto">
             <div class="flex flex-row justify-between">
-                <select id="sort" class="select select-primary w-full max-w-xs">
-                    <option disabled selected>Trier par</option>
-                    <option value="priceAsc">Prix croissant</option>
-                    <option value="priceDesc">Prix décroissant</option>
-                    <option value="nameAsc">Nom A-Z</option>
-                    <option value="nameDesc">Nom Z-A</option>
-                    <option value="new">Nouveautés</option>
-                    <option value="rate">Meilleures notes</option>
-                </select>
-                <div class="">
-                    <div class="flex flex-row justify-center relative">
-                        <input id="search" type="text" placeholder="Rechercher"
-                            class="input input-bordered input-primary w-full max-w-xs" />
-                        <button type="submit" class="absolute right-0 top-0 mt-3 mr-4">
-                            <svg class="h-5 w-5 text-gray-500" fill="none" stroke-linecap="round"
-                                stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
-                                <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                <div class="form-control">
+                    <div class="input-group">
+                        <button type="submit" class="btn btn-square no-animation">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="w-6 h-6">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M3.75 6.75h16.5M3.75 12h16.5M12 17.25h8.25" />
+                            </svg>
+                        </button>
+                        <select id="sort" class="select select-bordered">
+                            <option disabled selected>Trier par</option>
+                            <option value="priceAsc">Prix croissant</option>
+                            <option value="priceDesc">Prix décroissant</option>
+                            <option value="nameAsc">Nom A-Z</option>
+                            <option value="nameDesc">Nom Z-A</option>
+                            <option value="new">Nouveautés</option>
+                            <option value="rate">Meilleures notes</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-control">
+                    <div class="input-group">
+                        <input id="search" type="text" placeholder="Rechercher" class="input input-bordered" />
+                        <button type="submit" class="btn btn-square no-animation">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
                         </button>
                     </div>

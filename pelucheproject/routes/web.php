@@ -5,6 +5,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ThemeController;
 use App\Http\Controllers\MenuController;
+use App\Http\Controllers\CartController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -43,6 +44,10 @@ Route::get('/logout', function () {
 Route::get('/register', function () {
     return view('register');
 });
+
+Route::get('/addToCart', [CartController::class, 'store'])->name('addToCart');
+
+Route::get('/cart', [CartController::class, 'index'])->name('cart');
 
 
 Route::get('/dashboard', function () {

@@ -24,6 +24,14 @@
     
     $views = array_diff($viewsArray, $except);
     
+    if (Auth::check()) {
+        Cart::session(Auth::user()->id);
+    } elseif (Auth::guest()) {
+        Cart::session('guest');
+    }
+    //dd(Cart::getContent());
+    // echo(Cart::session(Auth::user()->id)->getContent()->count());
+    // echo(Auth::user()->avatar);
 @endphp
 
 <!doctype html>
@@ -35,6 +43,14 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js">
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+    </script>
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <title>E-commerce</title>
 </head>
@@ -65,7 +81,7 @@
                     <a class="btn btn-ghost normal-case text-xl" href="{{ route('accueil') }}"><img class="h-12"
                             src=""></a>
                 </div>
-                <div class="navbar-end mr-5">
+                <div class="navbar-end mr-5 gap-4">
                     <div title="Change Theme" class="dropdown dropdown-end ">
                         <div tabindex="0" class="btn gap-1 normal-case btn-ghost" spellcheck="false"><svg
                                 width="20" height="20" xmlns="http://www.w3.org/2000/svg" fill="none"
@@ -111,7 +127,6 @@
                         </div>
                     </div>
 
-                    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
                     <script>
                         $(document).ready(function() {
                             $('.post-name').click(function() {
@@ -136,11 +151,61 @@
                         </script>
                     @endif
 
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                        stroke="currentColor" class="w-6 h-6">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
-                    </svg>
+
+                    <div class="dropdown dropdown-end">
+                        <div class="indicator">
+                            <span class="indicator-item badge badge-secondary">{{ Cart::getTotalQuantity() }}</span>
+                            <label tabindex="0" class="btn"><svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                    viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                                    class="inline-block h-5 w-5 stroke-neutral-content md:h-6 md:w-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                                </svg></label>
+                        </div>
+                        <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-max">
+
+                            @if (Auth::check() || Auth::guest())
+                                @if (!Cart::session(Auth::check() ? Auth::user()->id : 'guest')->isEmpty())
+                                    @foreach (Cart::session(Auth::check() ? Auth::user()->id : 'guest')->getContent() as $item)
+                                        <li>
+                                            <a href="{{ route('produit', $item->id) }}" class="flex items-center gap-2">
+                                                <img src="{{ asset('storage/images/products/' . $item->attributes->image) }}"
+                                                    alt="product" class="w-20 h-20 rounded">
+                                                <div class="flex flex-col w-full">
+                                                    <span class="font-extrabold">{{ $item->name }}</span>
+                                                    <div class="flex flex-row justify-between">
+                                                        <span class="text-lg">x{{ $item->quantity }}</span>
+                                                        <span class="text-lg text-primary font-bold">
+                                                            {{ number_format($item->getPriceSumWithConditions(), 2, '.', '') }}€
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </li>
+                                    @endforeach
+                                    <div class="rounded-b-box p-2 mt-6 bg-primary text-base-content">
+                                        <div class="flex flex-row items-center justify-between">
+                                            <span class="font-bold">Total</span>
+                                            <span
+                                                class="font-extrabold">{{ number_format(Cart::session(Auth::check() ? Auth::user()->id : 'guest')->getTotal(), 2, '.', '') }}€
+                                            </span>
+                                            <a href="{{ route('cart') }}"
+                                                class="btn btn-secondary btn-sm rounded-full">Panier</a>
+
+                                        </div>
+                                    </div>
+                                @else
+                                    <li>
+                                        <div class="flex items-center gap-2">
+                                            <div class="flex flex-col">
+                                                <span class="font-bold">Votre panier est vide</span>
+                                            </div>
+                                        </div>
+                                    </li>
+                                @endif
+                            @endif
+                        </ul>
+                    </div>
 
 
                     </form>

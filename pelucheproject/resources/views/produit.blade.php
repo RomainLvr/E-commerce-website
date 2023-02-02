@@ -19,19 +19,19 @@
                     {{ $produit->name }}
                 </h1>
                 <div class="flex flex-row gap-2 items-baseline mt-2">
-                      
+
                     <div class="rating rating-half">
                         <input type="radio" name="rating-10" class="rating-hidden border-0 rounded-none" disabled
                             @if ($produit->getRate() == 0) checked @endif />
                         @for ($i = 1; $i <= 10; $i++)
                             @if ($i % 2 != 0)
                                 <input type="radio" name="rating-10"
-                                    class="bg-orange-400 mask mask-star-2 mask-half-1 border-0 rounded-none checked:bg-none checked:bg-orange-400" disabled
-                                    @if ($i / 2 <= $produit->getRate()) checked @endif />
+                                    class="bg-orange-400 mask mask-star-2 mask-half-1 border-0 rounded-none checked:bg-none checked:bg-orange-400"
+                                    disabled @if ($i / 2 <= $produit->getRate()) checked @endif />
                             @else
                                 <input type="radio" name="rating-10"
-                                    class="bg-orange-400 mask mask-star-2 mask-half-2 border-0 rounded-none checked:bg-none checked:bg-orange-400" disabled
-                                    @if ($i / 2 <= $produit->getRate()) checked @endif />
+                                    class="bg-orange-400 mask mask-star-2 mask-half-2 border-0 rounded-none checked:bg-none checked:bg-orange-400"
+                                    disabled @if ($i / 2 <= $produit->getRate()) checked @endif />
                             @endif
                         @endfor
                     </div>
@@ -67,11 +67,10 @@
                         </span>
                     @endif
                 </div>
-                @if ($produit->stock != 0)
-                    <p>Stock : {{ $produit->stock }} produit(s) restants</p>
-                @endif
+
 
                 @if ($produit->stock != 0)
+                    <p>Stock : {{ $produit->stock }} produit(s) restants</p>
                     <hr class="my-6" />
                     @if ($produit->stock > 1)
                         <div class="flex flex-col w-3/4">
@@ -86,8 +85,10 @@
                                 @endfor
                             </div>
                         </div>
+                    @else
+                        <input id="qte" type="hidden" value="1" />
                     @endif
-                    <button class="btn btn-primary" href="">
+                    <button class="btn btn-primary" id="addToCart">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                             stroke="currentColor" class="w-6 h-6">
                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -227,6 +228,27 @@
                 });
             });
         @endif
+
+        $(document).ready(function() {
+            $('#addToCart').click(function() {
+                var qte = $('#qte').val();
+                $.ajax({
+                    url: "{{ route('addToCart') }}",
+                    data: {
+                        productId: {{ $produit->id }},
+                        userId: @if (Auth::check())
+                            {{ auth()->user()->id }}
+                        @else
+                            "guest"
+                        @endif ,
+                        qte: qte
+                    },
+                    success: function(data) {
+                    }
+
+                });
+            });
+        });
     </script>
 
 
