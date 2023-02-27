@@ -27,9 +27,19 @@ class ProfileController extends Controller
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
         $request->user()->fill($request->validated());
+        $request->validate([
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
 
         if ($request->user()->isDirty('email')) {
             $request->user()->email_verified_at = null;
+        }
+
+        if ($request->hasFile('avatar')) {
+            $avatar = time() . '.' . $request->file('avatar')->extension();
+            $avatar = $request->file('avatar')->move(public_path('storage/images/avatars'), Auth::user()->id . '.' . $request->file('avatar')->extension());
+            $request->user()->avatar = $avatar->getFilename();
+            
         }
 
         $request->user()->save();
@@ -37,19 +47,6 @@ class ProfileController extends Controller
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
 
-    /**
-     * Update the user's avatar.
-     */
-    public function avatar(Request $request): RedirectResponse
-    {
-        $request->validate([
-            'avatar' => ['required', 'image', 'max:1024'],
-        ]);
-
-        $request->user()->updateAvatar($request->file('avatar'));
-
-        return Redirect::route('profile.edit')->with('status', 'avatar-updated');
-    }
 
     /**
      * Delete the user's account.
