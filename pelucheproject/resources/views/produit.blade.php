@@ -1,6 +1,8 @@
 <x-layout>
-    {{-- page de presentation du produit avec button d'ajout au panier, description, image, prix, stock, etc --}}
 
+    <button class="btn btn-primary ml-6 mt-6" onclick="window.location.href='{{ route('produits') }}'">
+        Retour aux produits
+    </button>
     <div class="container mx-auto my-12">
         <div class="flex flex-col md:flex-row">
             <div class="mr-6">
@@ -237,15 +239,43 @@
                     data: {
                         productId: {{ $produit->id }},
                         userId: @if (Auth::check())
-                            {{ auth()->user()->id }}
+                            {{ Auth::user()->id }}
                         @else
                             "guest"
                         @endif ,
                         qte: qte
                     },
                     success: function(data) {
+                        $('#cartCountIndicator').html(data.count);
+                        $('#cartTotal').html(data.total + ' €');
+                        $('#cartProducts').children("li").remove();
+                        $.each(data.items, function(index, item) {
+                            var name = item.name;
+                            var qte = item.quantity;
+                            var price = data.itemsPrices[item.id];
+                            var image = data.itemsImages[item.id];
+                            var link = data.itemsLinks[item.id];
+                            $('#cartProducts').prepend(
+                                `
+                                <li id="cartItem">
+                                            <a href="${link}" class="flex items-center gap-2">
+                                                <img src="${image}"
+                                                    alt="product" class="w-20 h-20 rounded">
+                                                <div class="flex flex-col w-full">
+                                                    <span class="font-extrabold">${name}</span>
+                                                    <div class="flex flex-row justify-between">
+                                                        <span class="text-lg">x${qte}</span>
+                                                        <span class="text-lg text-primary font-bold">
+                                                            ${price}€
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </li>
+                                `
+                            )
+                        });
                     }
-
                 });
             });
         });

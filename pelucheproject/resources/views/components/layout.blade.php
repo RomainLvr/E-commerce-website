@@ -3,7 +3,7 @@
     $session = session();
     //$views = (File::allFiles(resource_path('views')))->except(['produit', File::allFiles(resource_path('views/produit'))]);
     $except = array_merge(
-        ['produit', 'dashboard'],
+        ['produit', 'dashboard', 'cart'],
         array_map(function ($file) {
             return str_replace('.blade.php', '', $file->getFileName());
         }, File::allFiles(resource_path('views/auth'))),
@@ -154,7 +154,7 @@
 
                     <div class="dropdown dropdown-end">
                         <div class="indicator">
-                            <span class="indicator-item badge badge-secondary">{{ Cart::getTotalQuantity() }}</span>
+                            <span id="cartCountIndicator" class="indicator-item badge badge-secondary">{{ Cart::getTotalQuantity() }}</span>
                             <label tabindex="0" class="btn"><svg xmlns="http://www.w3.org/2000/svg" fill="none"
                                     viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
                                     class="inline-block h-5 w-5 stroke-neutral-content md:h-6 md:w-6">
@@ -162,12 +162,12 @@
                                         d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
                                 </svg></label>
                         </div>
-                        <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-max">
+                        <ul tabindex="0" id="cartProducts" class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-max">
 
                             @if (Auth::check() || Auth::guest())
                                 @if (!Cart::session(Auth::check() ? Auth::user()->id : 'guest')->isEmpty())
                                     @foreach (Cart::session(Auth::check() ? Auth::user()->id : 'guest')->getContent() as $item)
-                                        <li>
+                                        <li id="cartItem">
                                             <a href="{{ route('produit', $item->id) }}" class="flex items-center gap-2">
                                                 <img src="{{ asset('storage/images/products/' . $item->attributes->image) }}"
                                                     alt="product" class="w-20 h-20 rounded">
@@ -187,7 +187,7 @@
                                         <div class="flex flex-row items-center justify-between">
                                             <span class="font-bold">Total</span>
                                             <span
-                                                class="font-extrabold">{{ number_format(Cart::session(Auth::check() ? Auth::user()->id : 'guest')->getTotal(), 2, '.', '') }}€
+                                                id="cartTotal" class="font-extrabold">{{ number_format(Cart::session(Auth::check() ? Auth::user()->id : 'guest')->getTotal(), 2, '.', '') }}€
                                             </span>
                                             <a href="{{ route('cart') }}"
                                                 class="btn btn-secondary btn-sm rounded-full">Panier</a>
