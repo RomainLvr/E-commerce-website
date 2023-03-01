@@ -183,17 +183,6 @@
                                             </a>
                                         </li>
                                     @endforeach
-                                    <div class="rounded-b-box p-2 mt-6 bg-primary text-base-content">
-                                        <div class="flex flex-row items-center justify-between">
-                                            <span class="font-bold">Total</span>
-                                            <span
-                                                id="cartTotal" class="font-extrabold">{{ number_format(Cart::session(Auth::check() ? Auth::user()->id : 'guest')->getTotal(), 2, '.', '') }}€
-                                            </span>
-                                            <a href="{{ route('cart') }}"
-                                                class="btn btn-secondary btn-sm rounded-full">Panier</a>
-
-                                        </div>
-                                    </div>
                                 @else
                                     <li>
                                         <div class="flex items-center gap-2">
@@ -203,6 +192,17 @@
                                         </div>
                                     </li>
                                 @endif
+                                <div class="cart-info rounded-b-box p-2 mt-6 bg-primary text-base-content">
+                                    <div class="flex flex-row items-center justify-between">
+                                        <span class="font-bold">Total</span>
+                                        <span
+                                            id="cartTotal" class="font-extrabold">{{ number_format(Cart::session(Auth::check() ? Auth::user()->id : 'guest')->getTotal(), 2, '.', '') }}€
+                                        </span>
+                                        <a href="{{ route('cart') }}"
+                                            class="btn btn-secondary btn-sm rounded-full">Panier</a>
+
+                                    </div>
+                                </div>
                             @endif
                         </ul>
                     </div>

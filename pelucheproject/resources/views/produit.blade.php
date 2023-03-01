@@ -74,23 +74,41 @@
                 @if ($produit->stock != 0)
                     <p>Stock : {{ $produit->stock }} produit(s) restants</p>
                     <hr class="my-6" />
-                    @if ($produit->stock > 1)
-                        <div class="flex flex-col w-3/4">
-                            <label class="label">
-                                <span class="label-text">Quantité</span>
-                            </label>
-                            <input id="qte" type="range" min="1" max="{{ $produit->stock }}"
-                                value="1" class="range" step="1" />
-                            <div class="w-full flex justify-between text-xs px-2 mb-6">
-                                @for ($i = 1; $i <= $produit->stock; $i++)
-                                    <span>{{ $i }}</span>
-                                @endfor
-                            </div>
-                        </div>
-                    @else
-                        <input id="qte" type="hidden" value="1" />
-                    @endif
-                    <button class="btn btn-primary" id="addToCart">
+                    <div class="div-quantity">
+                        @if ($produit->stock > 1)
+                            @if (
+                                $produit->stock -
+                                    (Cart::session(Auth::user()->id)->get($produit->id)
+                                        ? Cart::session(Auth::user()->id)->get($produit->id)->quantity
+                                        : 0) >
+                                    0)
+                                <div class="div-slider flex flex-col w-3/4">
+                                    <label class="label">
+                                        <span class="label-text">Quantité</span>
+                                    </label>
+                                    <input id="qte" type="range" min="1"
+                                        max="{{ $produit->stock - (Cart::session(Auth::user()->id)->get($produit->id) ? Cart::session(Auth::user()->id)->get($produit->id)->quantity : 0) }}"
+                                        value="1" class="qte-slide range" step="1" />
+                                    <div class="slide-indicator w-full flex justify-between text-xs px-2 mb-6">
+                                        @for ($i = 1; $i <= $produit->stock - (Cart::session(Auth::user()->id)->get($produit->id) ? Cart::session(Auth::user()->id)->get($produit->id)->quantity : 0); $i++)
+                                            <span>{{ $i }}</span>
+                                        @endfor
+                                    </div>
+                                </div>
+                            @else
+                                <div class="text-red-500 mb-3">Vous avez déjà ajouté le stock maximum de ce produit au
+                                    panier</div>
+                            @endif
+                        @else
+                            <input id="qte" type="hidden" value="1" />
+                        @endif
+                    </div>
+                    <button class="btn btn-primary" id="addToCart" @if (
+                        $produit->stock -
+                            (Cart::session(Auth::user()->id)->get($produit->id)
+                                ? Cart::session(Auth::user()->id)->get($produit->id)->quantity
+                                : 0) <=
+                            0) disabled @endif>
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                             stroke="currentColor" class="w-6 h-6">
                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -117,8 +135,8 @@
                         <span class="ml-2">Paiement sécurisé</span>
                     </div>
                     <div class="flex flex-row items-center mt-6">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                            stroke="currentColor" class="w-6 h-6">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                            stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                             <path stroke-linecap="round" stroke-linejoin="round"
                                 d="M3 8.688c0-.864.933-1.405 1.683-.977l7.108 4.062a1.125 1.125 0 010 1.953l-7.108 4.062A1.125 1.125 0 013 16.81V8.688zM12.75 8.688c0-.864.933-1.405 1.683-.977l7.108 4.062a1.125 1.125 0 010 1.953l-7.108 4.062a1.125 1.125 0 01-1.683-.977V8.688z" />
                         </svg>
@@ -275,6 +293,23 @@
                                 `
                             )
                         });
+                        console.log(data.productStock - data.productQuantity);
+                        if (data.productStock - data.productQuantity == 0) {
+                            $('.div-quantity').append(`<div class="text-red-500 mb-3">Vous avez déjà ajouté le stock maximum de ce produit au
+                                panier</div>`);
+                            $('.div-slider').remove();
+                            $('#addToCart').prop('disabled', true);
+                        }
+                        if (data.productStock - data.productQuantity == 1) {
+                            $('.div-quantity').append(
+                            `<input id="qte" type="hidden" value="1" />`);
+                            $('.div-slider').remove();
+                        }
+                        $('.qte-slide').attr('max', data.productStock - data.productQuantity);
+                        $('.slide-indicator').children("span").remove();
+                        for (var i = 1; i <= data.productStock - data.productQuantity; i++) {
+                            $('.slide-indicator').append(`<span>${i}</span>`);
+                        }
                     }
                 });
             });

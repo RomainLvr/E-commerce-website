@@ -38,23 +38,27 @@ class CartController extends Controller
     {
         $product = ProductModel::findOrfail($request->productId);
 
-        \Cart::session($request->userId)->add(array(
-            'id' => $product->id,
-            'name' => $product->name,
-            'price' => $product->price,
-            'quantity' => $request->qte,
-            'attributes' => array(
-                'image' => $product->getPrimaryImage()->image,
-                'discount' => $product->discount,
-                'stock' => $product->stock,
-            ),
-            'conditions' => new CartCondition(array(
-                'name' => 'SALE -' . $product->discount . '%',
-                'type' => 'tax',
-                'value' => '-' . $product->discount . '%',
+        if ($product->stock > $request->qte) {
+            if (\Cart::session($request->userId)->get($request->productId)->quantity + $request->qte <= $product->stock) {
 
-            )),
-        ));
+                \Cart::session($request->userId)->add(array(
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'price' => $product->price,
+                    'quantity' => $request->qte,
+                    'attributes' => array(
+                        'image' => $product->getPrimaryImage()->image,
+                        'discount' => $product->discount,
+                        'stock' => $product->stock,
+                    ),
+                    'conditions' => new CartCondition(array(
+                        'name' => 'SALE -' . $product->discount . '%',
+                        'type' => 'tax',
+                        'value' => '-' . $product->discount . '%',
+                    )),
+                ));
+            }
+        }
 
         return response()->json($this->getCartData($request->userId));
     }
@@ -129,6 +133,8 @@ class CartController extends Controller
             $itemsPrices[$item->id] = number_format(\Cart::session($userID)->get($item->id)->getPriceSumWithConditions(), 2, ',', ' ');
         }
         $productQuantity = \Cart::session($userID)->get($item->id)->quantity;
+        $productStock = \Cart::session($userID)->get($item->id)->attributes->stock;
+        $productTotalPrice = number_format(\Cart::session($userID)->get($item->id)->getPriceSumWithConditions(), 2, ',', ' ');
 
         $cart = array(
             'total' => number_format(\Cart::session($userID)->getTotal(), 2, ',', ' '),
@@ -138,6 +144,8 @@ class CartController extends Controller
             'itemsLinks' => $itemsLinks,
             'itemsPrices' => $itemsPrices,
             'productQuantity' => $productQuantity,
+            'productStock' => $productStock,
+            'productTotalPrice' => $productTotalPrice,
         );
 
         return $cart;
